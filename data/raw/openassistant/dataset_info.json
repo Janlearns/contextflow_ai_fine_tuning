@@ -1,0 +1,164 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "oasst1",
+  "dataset_size": 106039965,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/OpenAssistant/oasst1@fdf72ae0827c1cda404aff25b6603abec9e3399b/data/train-00000-of-00001-b42a775f407cee45.parquet": {
+      "num_bytes": 39516251,
+      "checksum": null
+    },
+    "hf://datasets/OpenAssistant/oasst1@fdf72ae0827c1cda404aff25b6603abec9e3399b/data/validation-00000-of-00001-134b8fd0c89408b6.parquet": {
+      "num_bytes": 2080179,
+      "checksum": null
+    }
+  },
+  "download_size": 41596430,
+  "features": {
+    "message_id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "parent_id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "user_id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "created_date": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "role": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "lang": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "review_count": {
+      "dtype": "int32",
+      "_type": "Value"
+    },
+    "review_result": {
+      "dtype": "bool",
+      "_type": "Value"
+    },
+    "deleted": {
+      "dtype": "bool",
+      "_type": "Value"
+    },
+    "rank": {
+      "dtype": "int32",
+      "_type": "Value"
+    },
+    "synthetic": {
+      "dtype": "bool",
+      "_type": "Value"
+    },
+    "model_name": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "detoxify": {
+      "toxicity": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "severe_toxicity": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "obscene": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "identity_attack": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "insult": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "threat": {
+        "dtype": "float64",
+        "_type": "Value"
+      },
+      "sexual_explicit": {
+        "dtype": "float64",
+        "_type": "Value"
+      }
+    },
+    "message_tree_id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "tree_state": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "emojis": {
+      "feature": {
+        "name": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "count": {
+          "dtype": "int32",
+          "_type": "Value"
+        }
+      },
+      "_type": "Sequence"
+    },
+    "labels": {
+      "feature": {
+        "name": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "value": {
+          "dtype": "float64",
+          "_type": "Value"
+        },
+        "count": {
+          "dtype": "int32",
+          "_type": "Value"
+        }
+      },
+      "_type": "Sequence"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 147636395,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 100775194,
+      "num_examples": 84437,
+      "dataset_name": "oasst1"
+    },
+    "validation": {
+      "name": "validation",
+      "num_bytes": 5264771,
+      "num_examples": 4401,
+      "dataset_name": "oasst1"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

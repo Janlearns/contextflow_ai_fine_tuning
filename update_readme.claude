@@ -1,0 +1,15 @@
+* UPDATE readme.md
+
+dengan menambahkan:
+- cara menjalankan app
+- cara menjalankan train.py
+- langkah menjalan semua file notebook
+- cara menambahkan data baru
+- spesifikasi hardware yang di butuhkan
+- cara deploy docker
+- cara mendapatkan api key
+- spesifikasi model yang di gunakan
+- spesifikasi dataset yang di gunakan (beserta link nya)
+
+* update juga semua file docker agar bisa di gunakan
+
