@@ -21,7 +21,7 @@ class Config:
     ) if not os.path.isabs(os.getenv("OUTPUT_MODEL_DIR", "")) else os.getenv("OUTPUT_MODEL_DIR")
 
     # Training
-    LEARNING_RATE: float = float(os.getenv("LEARNING_RATE", "2e-4"))
+    LEARNING_RATE: float = float(os.getenv("LEARNING_RATE", "5e-5"))  # Diturunkan dari 2e-4 → 5e-5 untuk mencegah overfit
     BATCH_SIZE: int = int(os.getenv("BATCH_SIZE", "1"))
     NUM_EPOCHS: int = int(os.getenv("NUM_EPOCHS", "3"))
     MAX_SEQ_LENGTH: int = int(os.getenv("MAX_SEQ_LENGTH", "256"))

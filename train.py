@@ -14,7 +14,7 @@ def main():
 
     # Step 1: Preprocessing
     logger.info("Step 1: Preprocessing...")
-    train_ds, val_ds = run_preprocessing_pipeline(sample_size=5000)
+    train_ds, val_ds = run_preprocessing_pipeline(sample_size=10000)
 
     # Step 2: Fine-Tuning
     logger.info("Step 2: Fine-Tuning...")

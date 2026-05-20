@@ -179,7 +179,7 @@ python train.py
 | ------------------ | ------------------------------------ | --------------------------- |
 | `BASE_MODEL`       | `TinyLlama/TinyLlama-1.1B-Chat-v1.0` | Base model dari HuggingFace |
 | `OUTPUT_MODEL_DIR` | `./models/contextflow-finetuned`     | Direktori output model      |
-| `LEARNING_RATE`    | `2e-4`                               | Learning rate               |
+| `LEARNING_RATE`    | `5e-5`                               | Learning rate                   |
 | `BATCH_SIZE`       | `4`                                  | Batch size per device       |
 | `NUM_EPOCHS`       | `3`                                  | Jumlah epoch training       |
 | `MAX_SEQ_LENGTH`   | `512`                                | Panjang maksimum sequence   |
@@ -191,7 +191,7 @@ python train.py
 | `r`                           | 16                               | LoRA rank                        |
 | `lora_alpha`                  | 32                               | LoRA scaling factor              |
 | `target_modules`              | `q_proj, v_proj, k_proj, o_proj` | Layer yang di-fine-tune          |
-| `lora_dropout`                | 0.05                             | Dropout rate                     |
+| `lora_dropout`                | 0.1                              | Dropout rate                     |
 | `gradient_accumulation_steps` | 4                                | Effective batch = batch_size × 4 |
 | `gradient_checkpointing`      | True                             | Menghemat VRAM                   |
 
@@ -397,19 +397,32 @@ huggingface-cli login
 
 ### Dataset Internal (Company)
 
-| Format | Lokasi                             | Deskripsi                                 |
-| ------ | ---------------------------------- | ----------------------------------------- |
-| JSON   | `data/raw/company/company_qa.json` | 12 pasangan Q&A perusahaan (SOP, HR, dll) |
+Data perusahaan disimpan di `data/raw/company/` dengan struktur subfolder per kota dan per tipe:
+
+| Format | Lokasi | Deskripsi |
+| ------ | ------ | --------- |
+| CSV (Business) | `data/raw/company/{city}/` | Business dataset per kota (Amsterdam, Berlin, London, dll) — semicolon-delimited |
+| PDF | `data/raw/company/pdf/` | Dokumen PDF perusahaan (text + OCR fallback) |
+| Image | `data/raw/company/foto/` | Gambar dokumen — teks diekstrak via OCR (Tesseract) |
+| JSON | `data/raw/company/*.json` | Pasangan Q&A eksplisit |
+| CSV (Instruction) | `data/raw/company/*.csv` | Kolom: instruction, context, response |
+| DOCX / TXT | `data/raw/company/*.docx/txt` | Teks diekstrak per section/paragraf |
+
+> **Catatan:** Untuk fitur OCR (gambar & PDF scanned), install Tesseract OCR di host:
+> - Windows: Download dari https://github.com/UB-Mannheim/tesseract/wiki
+> - Linux: `sudo apt install tesseract-ocr`
+> - Mac: `brew install tesseract`
 
 ### Pipeline Preprocessing
 
-1. **Load** — Download semua dataset dari HuggingFace + load company data
-2. **Format** — Konversi ke format instruksi standar (`### Instruction: / ### Input: / ### Response:`)
-3. **Clean** — Hapus duplikat, missing values, filter panjang teks (10-1500 karakter)
-4. **Split** — 90% train, 10% validation
-5. **Save** — Simpan ke `data/formatted/train` dan `data/formatted/val`
+1. **Load** — Download 4 dataset dari HuggingFace (Dolly, Alpaca, OpenAssistant, CoQA)
+2. **Load Company** — Scan semua file di `data/raw/company/` (CSV, JSON, PDF, DOCX, TXT, Image)
+3. **Format** — Konversi ke format TinyLlama Chat (`<|system|>`, `<|user|>`, `<|assistant|>`)
+4. **Clean** — Hapus duplikat, missing values, filter panjang teks per source (source-aware)
+5. **Split** — 90% train, 10% validation
+6. **Save** — Simpan ke `data/formatted/train` dan `data/formatted/val`
 
-Default `sample_size=5000` per dataset untuk menghemat waktu training.
+Default `SAMPLE_SIZE=10000` per dataset HuggingFace. Company data diproses seluruhnya.
 
 ---
 
@@ -501,7 +514,7 @@ services:
 | **Database**         | Supabase (PostgreSQL)                                                  |
 | **Frontend**         | Streamlit                                                              |
 | **Data Science**     | NumPy, Pandas, Matplotlib, Seaborn, Scikit-learn                       |
-| **Document Parsing** | PyPDF2, python-docx                                                    |
+| **Document Parsing** | PyPDF2, python-docx, pdfplumber, pdf2image, Pillow                     |
 | **Containerization** | Docker, Docker Compose                                                 |
 | **CI/CD**            | GitHub Actions                                                         |
 | **Logging**          | Loguru                                                                 |

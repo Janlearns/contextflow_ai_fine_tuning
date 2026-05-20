@@ -50,7 +50,9 @@ def _extract_text_ocr(filepath: str) -> list[dict]:
         brew install tesseract poppler              (Mac)
     """
     try:
+        # pyrefly: ignore [missing-import]
         from pdf2image import convert_from_path  # konversi PDF ke list PIL images
+        # pyrefly: ignore [missing-import]
         import pytesseract  # wrapper Tesseract OCR
     except ImportError:
         logger.warning(

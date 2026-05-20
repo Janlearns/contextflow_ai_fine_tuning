@@ -7,6 +7,7 @@ from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     TrainingArguments,
+    EarlyStoppingCallback,
 )
 # pyrefly: ignore [missing-import]
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training, TaskType
@@ -75,7 +76,7 @@ def apply_lora(model):
         r=16,
         lora_alpha=32,
         target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
-        lora_dropout=0.05,
+        lora_dropout=0.1,    # Dinaikkan dari 0.05 → 0.1 untuk regularisasi anti-overfit
         bias="none",
         task_type=TaskType.CAUSAL_LM,
     )
@@ -105,6 +106,8 @@ def get_training_args(output_dir: str) -> TrainingArguments:
         save_steps=200,
         save_total_limit=2,
         load_best_model_at_end=True,
+        metric_for_best_model="eval_loss",   # Pilih checkpoint berdasarkan eval_loss terendah
+        greater_is_better=False,              # Semakin rendah eval_loss = semakin bagus
         report_to="none",
         optim="adamw_torch",
         seed=42,
@@ -137,6 +140,7 @@ def run_training(
         dataset_text_field="text",         # WAJIB — tanpa ini KeyError: None
         max_seq_length=config.MAX_SEQ_LENGTH,
         packing=False,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],  # Stop jika eval_loss tidak turun 3x eval berturut-turut
     )
 
     logger.info("Training started...")

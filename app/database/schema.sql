@@ -67,3 +67,15 @@ CREATE TABLE IF NOT EXISTS training_datasets (
     source TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS company_data (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    city TEXT,
+    company_name TEXT NOT NULL,
+    instruction TEXT NOT NULL,
+    context TEXT,
+    response TEXT NOT NULL,
+    source_file TEXT,
+    source_type TEXT CHECK (source_type IN ('csv', 'pdf', 'image', 'json', 'docx', 'txt')),
+    created_at TIMESTAMPTZ DEFAULT now()
+);

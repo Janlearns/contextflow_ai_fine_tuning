@@ -147,3 +147,95 @@ def save_training_dataset(model_id: str, dataset, batch_size: int = 500):
     except Exception as e:
         logger.error(f"Gagal save training dataset: {e}")
         return 0
+
+
+def save_company_data(records: list, batch_size: int = 500) -> int:
+    """
+    Simpan hasil preprocessing company data ke Supabase tabel company_data.
+    Records berisi list of dict dengan keys: instruction, context, response,
+    dan optional: city, company_name, source_file, source_type.
+    """
+    db = _get_db()
+    if not db:
+        logger.warning("Database tidak tersedia, company data tidak disimpan.")
+        return 0
+
+    try:
+        rows = []
+        for r in records:
+            rows.append({
+                "city": str(r.get("city", ""))[:500],
+                "company_name": str(r.get("company_name", r.get("instruction", "")))[:500],
+                "instruction": str(r.get("instruction", ""))[:5000],
+                "context": str(r.get("context", ""))[:5000],
+                "response": str(r.get("response", ""))[:5000],
+                "source_file": str(r.get("source_file", ""))[:500],
+                "source_type": str(r.get("source_type", "csv"))[:20],
+            })
+
+        total_saved = 0
+        for i in range(0, len(rows), batch_size):
+            batch = rows[i:i + batch_size]
+            try:
+                db.table("company_data").insert(batch).execute()
+                total_saved += len(batch)
+                logger.info(f"  Company data batch {i//batch_size + 1}: "
+                            f"{total_saved}/{len(rows)} saved")
+            except Exception as e:
+                logger.error(f"  Gagal save company batch {i//batch_size + 1}: {e}")
+
+        logger.info(f"Company data saved to Supabase: {total_saved}/{len(rows)} records")
+        return total_saved
+
+    except Exception as e:
+        logger.error(f"Gagal save company data: {e}")
+        return 0
+
+
+def get_company_training_data():
+    """
+    Ambil semua company data dari Supabase sebagai HuggingFace Dataset.
+    Return Dataset dengan kolom: instruction, context, response.
+    Return None jika tidak ada data atau DB tidak tersedia.
+    """
+    db = _get_db()
+    if not db:
+        return None
+
+    try:
+        # Fetch semua records dengan pagination (Supabase default limit = 1000)
+        all_data = []
+        page_size = 1000
+        offset = 0
+
+        while True:
+            result = (
+                db.table("company_data")
+                .select("instruction, context, response")
+                .range(offset, offset + page_size - 1)
+                .execute()
+            )
+
+            if not result.data:
+                break
+
+            all_data.extend(result.data)
+            offset += page_size
+
+            # Stop jika kurang dari page_size (sudah sampai akhir)
+            if len(result.data) < page_size:
+                break
+
+        if not all_data:
+            logger.info("Tidak ada company data di database.")
+            return None
+
+        # pyrefly: ignore [missing-import]
+        from datasets import Dataset
+        ds = Dataset.from_list(all_data)
+        logger.info(f"Loaded {len(ds)} company records from database")
+        return ds
+
+    except Exception as e:
+        logger.error(f"Gagal load company data dari DB: {e}")
+        return None

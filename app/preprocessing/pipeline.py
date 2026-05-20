@@ -3,7 +3,7 @@ import pandas as pd
 from datasets import Dataset, concatenate_datasets
 from app.preprocessing.data_loader import load_all_datasets, save_raw_datasets
 from app.preprocessing.formatter import apply_formatter
-from app.preprocessing.cleaner import remove_duplicates, remove_missing, filter_by_length
+from app.preprocessing.cleaner import remove_duplicates, remove_missing, filter_by_length, filter_by_length_per_source
 from app.utils.config import config
 from app.utils.logger import logger
 from typing import Tuple
@@ -47,7 +47,7 @@ def run_preprocessing_pipeline(sample_size: int = None) -> Tuple[Dataset, Datase
     # Clean
     df = remove_missing(df, required_cols=["instruction", "output"])
     df = remove_duplicates(df, subset=["instruction", "output"])
-    df = filter_by_length(df, col="output", min_len=1, max_len=1500)
+    df = filter_by_length_per_source(df, col="output")
     df = df[df["instruction"].str.len() >= 5]
     df = df.reset_index(drop=True)
 

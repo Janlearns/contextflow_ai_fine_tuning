@@ -1,4 +1,4 @@
-from datasets import load_dataset, Dataset
+from datasets import load_dataset, Dataset, concatenate_datasets
 from app.utils.logger import logger
 from app.utils.config import config
 import os
@@ -105,6 +105,46 @@ def load_coqa() -> Dataset:
     return dataset
 
 
+def load_company_from_db() -> Dataset:
+    """
+    Load company data dari Supabase database.
+    Return sebagai HuggingFace Dataset dengan kolom instruction, context, response.
+    Return None jika tidak ada data atau DB tidak tersedia.
+    """
+    logger.info("Loading company data from database...")
+    try:
+        from app.database.repository import get_company_training_data
+        ds = get_company_training_data()
+        if ds is not None:
+            logger.info(f"Company DB data loaded: {len(ds)} samples")
+        return ds
+    except Exception as e:
+        logger.warning(f"Gagal load company data dari DB: {e}")
+        return None
+
+
+def save_company_to_db(company_ds) -> int:
+    """
+    Simpan company data yang sudah di-preprocess ke Supabase database.
+    Menerima HuggingFace Dataset atau list of dicts.
+    """
+    try:
+        from app.database.repository import save_company_data
+
+        if hasattr(company_ds, 'to_pandas'):
+            records = company_ds.to_pandas().to_dict('records')
+        elif isinstance(company_ds, list):
+            records = company_ds
+        else:
+            logger.warning("Format company data tidak dikenali untuk save ke DB")
+            return 0
+
+        return save_company_data(records)
+    except Exception as e:
+        logger.warning(f"Gagal save company data ke DB: {e}")
+        return 0
+
+
 def load_all_datasets() -> dict:
     """Load semua dataset eksternal + company data dan return sebagai dict."""
     datasets = {}
@@ -122,15 +162,29 @@ def load_all_datasets() -> dict:
         except Exception as e:
             logger.warning(f"Gagal load dataset '{name}': {e}")
 
-    # Load company data (JSON, CSV, PDF, DOCX, TXT)
+    # Load company data dari file (JSON, CSV, PDF, DOCX, TXT, Image)
     try:
         from app.preprocessing.company_loader import load_company_data
         company_ds = load_company_data()
         if company_ds is not None and len(company_ds) > 0:
             datasets["company"] = company_ds
-            logger.info(f"Company data loaded: {len(company_ds)} samples")
+            logger.info(f"Company data loaded from files: {len(company_ds)} samples")
+
+            # Simpan ke database untuk persistensi
+            save_company_to_db(company_ds)
     except Exception as e:
         logger.warning(f"Gagal load company data: {e}")
+
+    # Fallback: load company data dari database jika file-based loading gagal/kosong
+    # Ini memungkinkan model belajar dari data yang sebelumnya sudah disimpan ke DB
+    if "company" not in datasets:
+        try:
+            company_db_ds = load_company_from_db()
+            if company_db_ds is not None and len(company_db_ds) > 0:
+                datasets["company"] = company_db_ds
+                logger.info(f"Company data loaded from DB (fallback): {len(company_db_ds)} samples")
+        except Exception as e:
+            logger.warning(f"Gagal load company data dari DB: {e}")
 
     if not datasets:
         raise RuntimeError("Tidak ada dataset yang berhasil diload!")
