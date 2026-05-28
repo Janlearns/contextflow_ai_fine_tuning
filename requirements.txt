@@ -18,6 +18,11 @@ sentencepiece==0.2.0
 bitsandbytes==0.43.1
 
 # =========================
+# UNSLOTH (Fine-Tuning Framework)
+# =========================
+unsloth
+
+# =========================
 # DATASETS COMPATIBILITY
 # =========================
 pyarrow==15.0.2

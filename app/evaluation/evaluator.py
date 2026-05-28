@@ -87,7 +87,7 @@ def evaluate_on_dataset(model, tokenizer, val_dataset: Dataset, num_samples: int
     references = []
 
     for i, sample in enumerate(samples):
-        prompt = f"<|system|>\nYou are a helpful assistant.</s>\n<|user|>\n{sample['instruction']}\n{sample['input']}</s>\n<|assistant|>\n"
+        prompt = f"<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n{sample['instruction']}\n{sample['input']}<|im_end|>\n<|im_start|>assistant\n"
         pred = generate_response(model, tokenizer, prompt)
         predictions.append(pred)
         references.append(sample["output"])

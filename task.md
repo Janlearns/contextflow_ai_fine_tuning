@@ -1,16 +1,11 @@
 ** TASK **
+- apakah sudah bisa di jalankan?
+- apa aja yang di benerin?
 
-- check semua file apakah ada termasuk file notebook, apakah ada bug atau error langsung saja perbaiki (tanpa mengubah kode sebelum nya)
-
-- check semua file apakah ada yang saling tidak terintregasi, jika ada langsung saja perbaiki (tanpa mengubah kode sebelum nya)
-
-- perbarui dokumentasi nya juga, biar mudah di baca
-
-- update nya requirements.txt
-
+fix langsung tapi bug yang sangat mengganggu saja jangan tidak ada hubungan nya)
 ** WARNING **
 
-- jangan pernah ubah kode yang sebelum nya
+- jangan pernah ubah kode yang tidak ada hubungan nya
 
 ** RULES **
 jangan bertanya pada ku langsugn saja mulai

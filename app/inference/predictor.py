@@ -60,14 +60,14 @@ class ContextFlowPredictor:
         logger.info("Base model loaded (belum fine-tuned).")
 
     def build_prompt(self, instruction: str, context: str = "") -> str:
-        """Prompt format TinyLlama-Chat — harus konsisten dengan INSTRUCTION_TEMPLATE di formatter.py."""
+        """Prompt format ChatML (Qwen2.5) — harus konsisten dengan INSTRUCTION_TEMPLATE di formatter.py."""
         return (
-            f"<|system|>\n"
-            f"You are a helpful assistant.</s>\n"
-            f"<|user|>\n"
+            f"<|im_start|>system\n"
+            f"You are a helpful assistant.<|im_end|>\n"
+            f"<|im_start|>user\n"
             f"{instruction}\n"
-            f"{context}</s>\n"
-            f"<|assistant|>\n"
+            f"{context}<|im_end|>\n"
+            f"<|im_start|>assistant\n"
         )
 
     def predict(

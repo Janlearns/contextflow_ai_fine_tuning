@@ -4,15 +4,15 @@ from app.utils.logger import logger
 from app.preprocessing.cleaner import clean_text
 
 
-# Format prompt bawaan TinyLlama-Chat — wajib konsisten antara training, inference, dan evaluasi.
-# Menggunakan token pembungkus <|system|>, <|user|>, <|assistant|> sesuai arsitektur TinyLlama.
-INSTRUCTION_TEMPLATE = """<|system|>
-You are a helpful assistant.</s>
-<|user|>
+# Format prompt ChatML — digunakan oleh Qwen2.5 dan model modern lainnya.
+# Wajib konsisten antara training, inference, dan evaluasi.
+INSTRUCTION_TEMPLATE = """<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
 {instruction}
-{context}</s>
-<|assistant|>
-{response}</s>"""
+{context}<|im_end|>
+<|im_start|>assistant
+{response}<|im_end|>"""
 
 
 def format_dolly(sample: dict) -> dict:
